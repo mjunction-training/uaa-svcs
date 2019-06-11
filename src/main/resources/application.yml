@@ -1,0 +1,78 @@
+spring:
+  aop:
+    proxy-target-class: true
+  application:
+    name: uaa-svcs
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: configserver
+      enabled: true 
+  zipkin:
+    locator:      discovery:        enabled: true
+    service:
+      name: zipkin-server
+  boot:
+    admin:
+      auto-registration: true
+      username: user
+      password: password
+      url:      - ${ADMIN_SERVER_URL:http://localhost:9090/}
+      client:        prefer-ip: true
+
+server:
+  port: ${appPort:8769}
+  # Use different context-path to avoid session cookie overlapping
+  use-forward-headers: false  context-path: /uaa 
+
+debug: true
+  
+eureka:
+  instance:
+    preferIpAddress: true
+    leaseRenewalIntervalInSeconds: 10
+    statusPageUrlPath: /uaa/actuator/info
+    healthCheckUrlPath: /uaa/actuator/health
+    metadataMap:
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${server.port}}
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+
+info:
+  component: Spring Boot Single Sign On Server
+    
+management:
+  health:
+    defaults:
+      enabled: false
+  security:    enabled: false
+
+security:
+  basic:
+    enabled: false
+  user:
+    password: password
+      
+# Logging
+logging:
+  pattern:
+    console: "[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{15}#%line %msg\n"
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    com.training.mjunction.usersvcs: DEBUG
+    org.springframework: ERROR
+    org.hibernate: DEBUG
+    sun.rmi: ERROR
+    org.reflections: ERROR
+    sun.reflect: ERROR
+    org.apache.coyote.http11: ERROR
+    org.glassfish.jersey.internal.util: ERROR
+    org.apache.tomcat.util: ERROR
+    org.apache.catalina.core: ERROR
+    com.sun.jersey.server.impl: ERROR
+
