@@ -56,9 +56,9 @@ public class JpaConfig {
 
 				ThreadContext.put("user", username);
 
-				return Optional.of(username).orElseGet(() -> "UNKNOWN");
+				return Optional.of(username);
 			}
-			return "UNKNOWN";
+			return Optional.of("UNKNOWN");
 		};
 	}
 

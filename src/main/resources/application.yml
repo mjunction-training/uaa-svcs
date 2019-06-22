@@ -15,16 +15,16 @@ spring:
       name: zipkin-server
   boot:
     admin:
-      auto-registration: true
-      username: user
-      password: password
-      url:      - ${ADMIN_SERVER_URL:http://localhost:9090/}
-      client:        prefer-ip: true
+      client:
+        username: "user"       #These two are needed so that the client
+        password: "password"   #can register at the protected server api
+        url:
+        - http://localhost:9090/
 
 server:
   port: ${appPort:8769}
-  # Use different context-path to avoid session cookie overlapping
-  use-forward-headers: false  context-path: /uaa 
+  servlet:
+    context-path: /uaa
 
 debug: true
   
@@ -49,30 +49,32 @@ management:
   health:
     defaults:
       enabled: false
-  security:    enabled: false
-
-security:
-  basic:
-    enabled: false
-  user:
-    password: password
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    shutdown: 
+      enabled: true
       
 # Logging
-logging:
-  pattern:
-    console: "[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{15}#%line %msg\n"
-  level:
-    root: INFO
-    org.springframework.security: DEBUG
-    com.training.mjunction.usersvcs: DEBUG
-    org.springframework: ERROR
-    org.hibernate: DEBUG
-    sun.rmi: ERROR
-    org.reflections: ERROR
-    sun.reflect: ERROR
-    org.apache.coyote.http11: ERROR
-    org.glassfish.jersey.internal.util: ERROR
-    org.apache.tomcat.util: ERROR
-    org.apache.catalina.core: ERROR
-    com.sun.jersey.server.impl: ERROR
+logging: 
+  pattern: 
+    console: "[%-5level] %date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{15}#%line %msg\n" 
+  level: 
+    root: INFO 
+    org.springframework.security: DEBUG 
+    com.training.mjunction.usersvcs: DEBUG 
+    org.springframework: ERROR 
+    org.hibernate: DEBUG 
+    sun.rmi: ERROR 
+    org.reflections: ERROR 
+    sun.reflect: ERROR 
+    org.apache.coyote.http11: ERROR 
+    org.glassfish.jersey.internal.util: ERROR 
+    org.apache.tomcat.util: ERROR 
+    org.apache.catalina.core: ERROR 
+    com.sun.jersey.server.impl: ERROR 
 

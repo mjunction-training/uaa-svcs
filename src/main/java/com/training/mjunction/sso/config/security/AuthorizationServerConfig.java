@@ -1,5 +1,7 @@
 package com.training.mjunction.sso.config.security;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
@@ -19,9 +22,6 @@ import com.training.mjunction.sso.service.UserDetailsService;
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
-
-	@Autowired
-	private TokenStore tokenStore;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -34,7 +34,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	private AuthenticationManager authenticationManager;
 
 	@Autowired
-	@Qualifier("jwtAccessTokenConverter")
+	private TokenStore tokenStore;
+
+	@Autowired
 	private JwtAccessTokenConverter jwtAccessTokenConverter;
 
 	@Autowired
@@ -43,7 +45,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	public void configure(final AuthorizationServerSecurityConfigurer oauthServer) {
 		oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()")
-				.passwordEncoder(passwordEncoder);
+				.allowFormAuthenticationForClients().passwordEncoder(passwordEncoder);
 	}
 
 	@Override
@@ -53,8 +55,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
 	@Override
 	public void configure(final AuthorizationServerEndpointsConfigurer endpoints) {
-		endpoints.tokenStore(tokenStore).authenticationManager(authenticationManager)
-				.userDetailsService(userDetailsService).accessTokenConverter(jwtAccessTokenConverter);
+		final TokenEnhancerChain enhancerChain = new TokenEnhancerChain();
+		enhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter));
+		endpoints.tokenStore(tokenStore).accessTokenConverter(jwtAccessTokenConverter).tokenEnhancer(enhancerChain)
+				.authenticationManager(authenticationManager).userDetailsService(userDetailsService);
 	}
 
 }
