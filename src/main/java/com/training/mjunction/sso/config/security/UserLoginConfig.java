@@ -29,8 +29,10 @@ public class UserLoginConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/login", "/error").permitAll().anyRequest().authenticated().and()
-				.formLogin().permitAll();
+		http.authorizeRequests().mvcMatchers("/.well-known/jwks.json").permitAll().anyRequest().authenticated().and()
+				.authorizeRequests().antMatchers("/login", "/error").permitAll().anyRequest().authenticated().and()
+				.formLogin().permitAll().and().csrf()
+				.ignoringRequestMatchers(request -> "/introspect".equals(request.getRequestURI()));
 	}
 
 	@Override
