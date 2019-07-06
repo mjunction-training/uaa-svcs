@@ -1,4 +1,7 @@
 spring:
+  redis:
+    host: localhost
+    port: 6379
   aop:
     proxy-target-class: true
   application:
@@ -23,6 +26,14 @@ spring:
 
 server:
   port: ${appPort:8769}
+  use-forward-headers: true
+  ssl:
+    key-store-type: PKCS12
+    key-store: classpath:certs/server-keystore.p12
+    key-store-password: password
+    key-password: password
+    key-alias: server
+    clientAuth: want
   servlet:
     context-path: /uaa
 
@@ -46,6 +57,10 @@ info:
   component: Spring Boot Single Sign On Server
     
 management:
+  server:
+    port: 7891
+    ssl:
+      enabled: false
   health:
     defaults:
       enabled: false
